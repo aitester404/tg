@@ -4,6 +4,8 @@ namespace eSkyblock;
 
 use pocketmine\player\Player;
 use pocketmine\utils\Config;
+use pocketmine\console\ConsoleCommandSender;
+use pocketmine\world\Position;
 
 class IslandManager {
 
@@ -27,20 +29,25 @@ class IslandManager {
         $schemFile = $this->plugin->getConfig()->get("startingIsland"); // örn: "start.schem"
         $schemName = pathinfo($schemFile, PATHINFO_FILENAME);
 
-        // EasyEdit komutları
-        $player->getServer()->dispatchCommand($player, "//load " . $schemName);
-        $player->getServer()->dispatchCommand($player, "//paste");
+        // EasyEdit komutlarını konsoldan çalıştır → oyuncuya mesaj gitmez
+        $console = new ConsoleCommandSender($this->plugin->getServer(), $this->plugin->getServer()->getLanguage());
+        $this->plugin->getServer()->dispatchCommand($console, "//load " . $schemName);
+        $this->plugin->getServer()->dispatchCommand($console, "//paste");
+
+        // Ada spawn koordinatı (örnek: 100,70,100)
+        $spawnPos = new Position(100, 70, 100, $player->getWorld());
 
         $data->set("island", [
             "created" => time(),
             "partners" => [],
             "lastReset" => 0,
             "xp" => 0,
-            "level" => 0
+            "level" => 0,
+            "spawn" => [$spawnPos->getX(), $spawnPos->getY(), $spawnPos->getZ()]
         ]);
         $data->save();
 
-        $player->sendMessage("§aAda başarıyla oluşturuldu ve " . $schemName . " yüklendi!");
+        $player->sendMessage("§aAda başarıyla oluşturuldu!");
     }
 
     public function resetIsland(Player $player): void {
@@ -55,15 +62,29 @@ class IslandManager {
         $schemFile = $this->plugin->getConfig()->get("startingIsland");
         $schemName = pathinfo($schemFile, PATHINFO_FILENAME);
 
-        $player->getServer()->dispatchCommand($player, "//load " . $schemName);
-        $player->getServer()->dispatchCommand($player, "//paste");
+        $console = new ConsoleCommandSender($this->plugin->getServer(), $this->plugin->getServer()->getLanguage());
+        $this->plugin->getServer()->dispatchCommand($console, "//load " . $schemName);
+        $this->plugin->getServer()->dispatchCommand($console, "//paste");
 
         $data->set("lastReset", time());
         $data->set("xp", 0);
         $data->set("level", 0);
         $data->save();
 
-        $player->sendMessage("§aAda başarıyla sıfırlandı ve " . $schemName . " yeniden yüklendi!");
+        $player->sendMessage("§aAda başarıyla sıfırlandı!");
+    }
+
+    public function teleportToIsland(Player $player): void {
+        $data = $this->getPlayerData($player);
+        $island = $data->get("island", null);
+        if($island === null){
+            $player->sendMessage("§cHenüz adan yok!");
+            return;
+        }
+        [$x, $y, $z] = $island["spawn"];
+        $pos = new Position($x, $y, $z, $player->getWorld());
+        $player->teleport($pos);
+        $player->sendMessage("§aAdana ışınlandın!");
     }
 
     public function addPartner(Player $owner, string $partnerName): void {
