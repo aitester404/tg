@@ -14,6 +14,7 @@ final class IslandService {
     public function createFromTemplate(string $worldName) : bool {
         $wm = Server::getInstance()->getWorldManager();
 
+        // Eğer ada zaten varsa sadece yükle
         if($wm->isWorldGenerated($worldName)){
             if(!$wm->isWorldLoaded($worldName)){
                 $wm->loadWorld($worldName);
@@ -65,8 +66,10 @@ final class IslandService {
             return null;
         }
 
-        // Senin mcworld’deki spawn koordinatı (0, -52, 0)
+        // Chunk hazırla (0,0 koordinatı)
         $world->loadChunk(0 >> 4, 0 >> 4, true);
+
+        // Senin mcworld’deki spawn noktası: (0, -52, 0)
         return new Position(0.5, -52, 0.5, $world);
     }
 
