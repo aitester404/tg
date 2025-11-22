@@ -7,3 +7,9 @@ commands:
   ada:
     description: Ada menüsünü açar
     usage: /ada
+    permission: skyblock.command.ada
+
+permissions:
+  skyblock.command.ada:
+    description: Oyuncuların /ada komutunu kullanabilmesi için izin
+    default: true
