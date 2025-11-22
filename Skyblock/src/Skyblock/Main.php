@@ -71,14 +71,15 @@ class Main extends PluginBase {
             return;
         }
 
-        // EasyEdit ile schematic paste
-        $schemPath = $this->getDataFolder() . "template.schem";
+        // EasyEdit schematic yolu
+        $schemPath = Server::getInstance()->getDataPath() . "plugin_data/EasyEdit/schematics/template.schem";
         if(!is_file($schemPath)){
             $player->sendMessage("§cSchematic bulunamadı: template.schem");
             return;
         }
 
-        $pastePos = new Position(0, 100, 0, $world); // ada merkezi
+        // Paste schematic
+        $pastePos = new Position(0, 100, 0, $world);
         EasyEdit::getInstance()->getSchematicsManager()->pasteSchematic($schemPath, $pastePos);
 
         // Oyuncuyu spawn noktasına ışınla
@@ -127,3 +128,4 @@ class Main extends PluginBase {
         @rmdir($dir);
     }
 }
+
