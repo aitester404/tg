@@ -2,8 +2,8 @@
 
 namespace eSkyblock;
 
-use pocketmine\player\Player;
 use pocketmine\form\Form;
+use pocketmine\player\Player;
 
 class Menu implements Form {
 
@@ -33,9 +33,11 @@ class Menu implements Form {
             case 0: // Ada Oluştur
                 $this->plugin->getIslandManager()->createIsland($player);
                 break;
+
             case 1: // Ada Bilgisi
-                $player->sendMessage("§eHenüz ada bilgisi sistemi eklenmedi.");
+                $player->sendMessage("§eAda bilgisi sistemi yakında.");
                 break;
+
             case 2: // Ada Sil
                 $player->sendMessage("§cAda silme özelliği yakında.");
                 break;
