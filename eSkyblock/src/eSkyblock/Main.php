@@ -13,7 +13,7 @@ class Main extends PluginBase {
 
     public function onEnable(): void {
         $this->islandManager = new IslandManager($this);
-        $this->getLogger()->info("§aSkyblock plugin aktif!");
+        $this->getLogger()->info("§aeSkyblock (MultiWorld) aktif!");
     }
 
     public function getIslandManager(): IslandManager {
@@ -23,8 +23,7 @@ class Main extends PluginBase {
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
         if($command->getName() === "ada"){
             if($sender instanceof Player){
-                $menu = new Menu($this); // Menü sınıfını oluştur
-                $sender->sendForm($menu); // Menü açılır
+                $sender->sendForm(new Menu($this));
             } else {
                 $sender->sendMessage("§cBu komut sadece oyunda kullanılabilir!");
             }
@@ -33,3 +32,4 @@ class Main extends PluginBase {
         return false;
     }
 }
+
