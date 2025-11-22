@@ -13,10 +13,11 @@ class IslandManager {
         $worldName = "island_" . strtolower($player->getName());
         $wm = Server::getInstance()->getWorldManager();
 
-        // Eğer dünya yoksa MultiWorld komutuyla void olarak oluştur
+        // Dünya yoksa oluştur
         if(!$wm->isWorldGenerated($worldName)){
             $console = new ConsoleCommandSender(Server::getInstance(), Server::getInstance()->getLanguage());
             Server::getInstance()->dispatchCommand($console, "mw create $worldName 0 void");
+            $player->sendMessage("§aVoid dünya oluşturuldu: $worldName");
         }
 
         // Dünyayı yükle
@@ -33,16 +34,17 @@ class IslandManager {
         // Ada başlangıç koordinatı
         $baseX = 0; $baseY = 100; $baseZ = 0;
 
-        // EasyEdit schematic dosyasını yapıştır
+        // Schematic yapıştır
         $console = new ConsoleCommandSender(Server::getInstance(), Server::getInstance()->getLanguage());
+        $player->sendMessage("§eSchematic yapıştırılıyor...");
         Server::getInstance()->dispatchCommand($console, "easyedit paste myisland $baseX $baseY $baseZ $worldName");
 
-        // Schematic boyutları: 6x6x5
+        // Spawn noktası (6x6x5 schematic)
         $spawnX = $baseX + 3;
         $spawnZ = $baseZ + 3;
         $spawnY = $baseY + 5;
 
-        // Oyuncuyu ortasına ışınla
+        // Oyuncuyu ışınla
         $player->teleport(new Position($spawnX, $spawnY, $spawnZ, $world));
         $player->sendMessage("§aKendi Skyblock adan hazır, ortasında doğdun!");
     }
