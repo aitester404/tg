@@ -34,7 +34,7 @@ class IslandManager {
         // Ada başlangıç koordinatı
         $baseX = 0; $baseY = 100; $baseZ = 0;
 
-        // Schematic yükle ve yapıştır (WorldEdit tarzı)
+        // Console üzerinden schematic yükle ve yapıştır
         $console = new ConsoleCommandSender(Server::getInstance(), Server::getInstance()->getLanguage());
         Server::getInstance()->dispatchCommand($console, "//load myisland");
         Server::getInstance()->dispatchCommand($console, "//paste");
