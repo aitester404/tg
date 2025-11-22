@@ -1,0 +1,13 @@
+name: eSkyblock
+main: eSkyblock\Main
+version: 1.0.0
+api: 5.0.0
+author: Emir
+commands:
+  ada:
+    description: Ada menüsünü açar
+    usage: /ada
+    permission: eskyblock.command.ada
+permissions:
+  eskyblock.command.ada:
+    default: true
