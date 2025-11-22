@@ -1,9 +1,9 @@
 name: SkyblockFormIsland
 main: Skyblock\Main
-version: 1.2.0
+version: 1.4.0
 api: 5.0.0
-author: Emir & Copilot
-description: FormAPI ile Skyblock ada menüsü (güvenli chunk oluşturma)
+author: Emir
+description: FormAPI ile Skyblock ada menüsü (ikonlu)
 commands:
   ada:
     description: Skyblock ada menüsü
