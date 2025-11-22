@@ -13,19 +13,18 @@ class IslandManager {
         $worldName = "island_" . strtolower($player->getName());
         $wm = Server::getInstance()->getWorldManager();
 
-        // Eğer dünya yoksa EasyEdit ile void olarak oluştur
+        // Eğer dünya yoksa MultiWorld komutuyla void olarak oluştur
         if(!$wm->isWorldGenerated($worldName)){
             $console = new ConsoleCommandSender(Server::getInstance(), Server::getInstance()->getLanguage());
-            Server::getInstance()->dispatchCommand($console, "easyedit createworld $worldName void");
+            Server::getInstance()->dispatchCommand($console, "mw create $worldName 0 void");
         }
 
         // Dünyayı yükle
-        $world = $wm->getWorldByName($worldName);
-        if($world === null){
+        if(!$wm->isWorldLoaded($worldName)){
             $wm->loadWorld($worldName);
-            $world = $wm->getWorldByName($worldName);
         }
 
+        $world = $wm->getWorldByName($worldName);
         if($world === null){
             $player->sendMessage("§cDünya yüklenemedi: $worldName");
             return;
@@ -39,14 +38,9 @@ class IslandManager {
         Server::getInstance()->dispatchCommand($console, "easyedit paste myisland $baseX $baseY $baseZ $worldName");
 
         // Schematic boyutları: 6x6x5
-        $schemWidth = 6;
-        $schemLength = 6;
-        $schemHeight = 5;
-
-        // Ortasını hesapla
-        $spawnX = $baseX + ($schemWidth / 2);
-        $spawnZ = $baseZ + ($schemLength / 2);
-        $spawnY = $baseY + $schemHeight;
+        $spawnX = $baseX + 3;
+        $spawnZ = $baseZ + 3;
+        $spawnY = $baseY + 5;
 
         // Oyuncuyu ortasına ışınla
         $player->teleport(new Position($spawnX, $spawnY, $spawnZ, $world));
