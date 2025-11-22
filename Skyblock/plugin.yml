@@ -1,8 +1,8 @@
 name: SkyblockFormIsland
 main: Skyblock\Main
-version: 1.0.0
+version: 1.1.0
 api: 5.0.0
-author: Emir & Copilot
+author: Emir
 description: FormAPI ile Skyblock ada menüsü
 commands:
   ada:
