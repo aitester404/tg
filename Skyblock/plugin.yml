@@ -1,0 +1,9 @@
+name: Skyblock
+main: Skyblock\Main
+version: 1.0.0
+api: 5.0.0
+author: Sen
+commands:
+  ada:
+    description: Ada menüsünü açar
+    usage: /ada
