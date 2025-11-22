@@ -29,7 +29,7 @@ class AdaCommand extends Command {
             if ($data === null) return;
 
             switch ($data) {
-                case 0: // Ada oluştur
+                case 0:
                     $player->sendMessage("§aKendi adan oluşturuluyor...");
                     IslandManager::createIsland($player);
                     break;
