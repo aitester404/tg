@@ -5,33 +5,40 @@ namespace Skyblock\utils;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\world\WorldCreationOptions;
+use pocketmine\world\Position;
 
 class IslandManager {
 
     public static function createIsland(Player $player) : void {
         $worldName = "island_" . strtolower($player->getName());
 
-        // Eğer dünya yoksa oluştur
-        if(!Server::getInstance()->getWorldManager()->isWorldGenerated($worldName)){
-            Server::getInstance()->getWorldManager()->generateWorld($worldName, new WorldCreationOptions());
+        $wm = Server::getInstance()->getWorldManager();
+
+        // Dünya yoksa oluştur
+        if(!$wm->isWorldGenerated($worldName)){
+            $wm->generateWorld($worldName, new WorldCreationOptions());
         }
 
         // Dünyayı yükle
-        $world = Server::getInstance()->getWorldManager()->getWorldByName($worldName);
+        $world = $wm->getWorldByName($worldName);
         if($world === null){
-            Server::getInstance()->getWorldManager()->loadWorld($worldName);
-            $world = Server::getInstance()->getWorldManager()->getWorldByName($worldName);
+            $wm->loadWorld($worldName);
+            $world = $wm->getWorldByName($worldName);
         }
 
-        // Ada spawn koordinatı
+        if($world === null){
+            $player->sendMessage("§cDünya yüklenemedi: $worldName");
+            return;
+        }
+
+        // Ada koordinatı
         $x = 0; $y = 100; $z = 0;
 
-        // EasyEdit schematic dosyasını bu dünyaya yapıştır
-        Server::getInstance()->dispatchCommand(Server::getInstance()->getConsoleSender(),
-            "easyedit paste myisland $x $y $z $worldName");
+        // EasyEdit komutunu oyuncu üzerinden çalıştır
+        Server::getInstance()->dispatchCommand($player, "easyedit paste myisland $x $y $z $worldName");
 
-        // Oyuncuyu kendi adasına ışınla
-        $player->teleport(new \pocketmine\world\Position($x, $y, $z, $world));
+        // Oyuncuyu ışınla
+        $player->teleport(new Position($x, $y, $z, $world));
         $player->sendMessage("§aKendi Skyblock adan hazır!");
     }
 }
