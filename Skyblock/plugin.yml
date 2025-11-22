@@ -1,9 +1,9 @@
 name: SkyblockFormIsland
 main: Skyblock\Main
-version: 2.2.0
+version: 3.1.0
 api: 5.0.0
-author: Emir 
-description: Skyblock islands cloned from template.mcworld via FormAPI menu
+author: Emir & Copilot
+description: Skyblock ada menüsü (EasyEdit schematic)
 commands:
   ada:
     description: Skyblock ada menüsü
