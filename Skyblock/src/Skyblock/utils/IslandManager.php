@@ -7,6 +7,7 @@ use pocketmine\Server;
 use pocketmine\world\WorldCreationOptions;
 use pocketmine\world\Position;
 use pocketmine\world\generator\VoidGenerator;
+use pocketmine\console\ConsoleCommandSender;
 
 class IslandManager {
 
@@ -37,7 +38,7 @@ class IslandManager {
         $x = 0; $y = 100; $z = 0;
 
         // EasyEdit schematic dosyasını console üzerinden yapıştır
-        $console = Server::getInstance()->getCommandSender();
+        $console = new ConsoleCommandSender(Server::getInstance(), Server::getInstance()->getLanguage());
         Server::getInstance()->dispatchCommand($console, "easyedit paste myisland $x $y $z $worldName");
 
         // Oyuncuyu ışınla
@@ -45,4 +46,3 @@ class IslandManager {
         $player->sendMessage("§aKendi Skyblock adan hazır!");
     }
 }
-
