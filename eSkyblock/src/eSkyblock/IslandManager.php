@@ -1,3 +1,5 @@
+<?php
+
 public function createIsland(Player $player): void {
     $name = strtolower($player->getName());
     $worldName = "skyblock_" . $name;
@@ -58,3 +60,4 @@ public function createIsland(Player $player): void {
     $player->teleport($center->add(0.5, 2, 0.5), $world);
     $player->sendMessage("§aKendi Skyblock dünyan oluşturuldu: §b$worldName");
 }
+
