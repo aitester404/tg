@@ -1,16 +1,14 @@
-name: Skyblock
+name: SkyblockFormIsland
 main: Skyblock\Main
 version: 1.0.0
 api: 5.0.0
-author: Sen
-
+author: Emir & Copilot
+description: FormAPI ile Skyblock ada menüsü
 commands:
   ada:
-    description: Ada menüsünü açar
-    usage: /ada
+    description: Skyblock ada menüsü
+    usage: "/ada"
     permission: skyblock.command.ada
-
 permissions:
   skyblock.command.ada:
-    description: Oyuncuların /ada komutunu kullanabilmesi için izin
     default: true
