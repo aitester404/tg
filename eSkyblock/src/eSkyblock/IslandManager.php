@@ -2,125 +2,47 @@
 
 namespace eSkyblock;
 
+use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\VanillaBlocks;
+use pocketmine\math\Vector3;
 use pocketmine\player\Player;
-use pocketmine\utils\Config;
-use pocketmine\console\ConsoleCommandSender;
-use pocketmine\world\Position;
+use pocketmine\world\World;
 
-class IslandManager {
+class IslandGenerator {
 
-    private Main $plugin;
+    public static function createIsland(Player $player): void {
+        $world = $player->getWorld();
+        $center = $player->getPosition()->floor()->add(0, 10, 0); // oyuncunun üstünde 10 blok yukarıda ada
 
-    public function __construct(Main $plugin){
-        $this->plugin = $plugin;
-    }
-
-    public function getPlayerData(Player $player): Config {
-        return new Config($this->plugin->getDataFolder() . "players/" . strtolower($player->getName()) . ".yml", Config::YAML);
-    }
-
-    public function createIsland(Player $player): void {
-        $data = $this->getPlayerData($player);
-        if($data->exists("island")){
-            $player->sendMessage("§cZaten bir adan var!");
-            return;
+        // 5x5 taş platform
+        for($x = -2; $x <= 2; $x++){
+            for($z = -2; $z <= 2; $z++){
+                $pos = $center->add($x, 0, $z);
+                $world->setBlock($pos, VanillaBlocks::STONE());
+            }
         }
 
-        $schemFile = $this->plugin->getConfig()->get("startingIsland"); // örn: "start.schem"
-        $schemName = pathinfo($schemFile, PATHINFO_FILENAME);
+        // Ortadaki sandık
+        $chestPos = $center->add(0, 1, 0);
+        $world->setBlock($chestPos, VanillaBlocks::CHEST());
 
-        // EasyEdit komutlarını konsoldan çalıştır → oyuncuya mesaj gitmez
-        $console = new ConsoleCommandSender($this->plugin->getServer(), $this->plugin->getServer()->getLanguage());
-        $this->plugin->getServer()->dispatchCommand($console, "//load " . $schemName);
-        $this->plugin->getServer()->dispatchCommand($console, "//paste");
-
-        // Ada spawn koordinatı (örnek: 100,70,100)
-        $spawnPos = new Position(100, 70, 100, $player->getWorld());
-
-        $data->set("island", [
-            "created" => time(),
-            "partners" => [],
-            "lastReset" => 0,
-            "xp" => 0,
-            "level" => 0,
-            "spawn" => [$spawnPos->getX(), $spawnPos->getY(), $spawnPos->getZ()]
-        ]);
-        $data->save();
-
-        $player->sendMessage("§aAda başarıyla oluşturuldu!");
-    }
-
-    public function resetIsland(Player $player): void {
-        $data = $this->getPlayerData($player);
-        $lastReset = $data->get("lastReset", 0);
-
-        if(time() - $lastReset < 604800){ // 7 gün
-            $player->sendMessage("§cAda sadece 7 günde bir sıfırlanabilir!");
-            return;
+        // Sandığa başlangıç itemleri ekle
+        $tile = $world->getTile($chestPos);
+        if($tile instanceof \pocketmine\block\tile\Chest){
+            $inv = $tile->getInventory();
+            $inv->addItem(VanillaBlocks::SAPLING()->asItem()); // ağaç için fidan
+            $inv->addItem(VanillaBlocks::DIRT()->asItem()->setCount(5)); // toprak
+            $inv->addItem(VanillaBlocks::ICE()->asItem());
+            $inv->addItem(VanillaBlocks::LAVA()->asItem());
         }
 
-        $schemFile = $this->plugin->getConfig()->get("startingIsland");
-        $schemName = pathinfo($schemFile, PATHINFO_FILENAME);
+        // Ortasına bir toprak + fidan (ağaç için)
+        $treeBase = $center->add(1, 1, 1);
+        $world->setBlock($treeBase, VanillaBlocks::DIRT());
+        $world->setBlock($treeBase->add(0, 1, 0), VanillaBlocks::OAK_SAPLING());
 
-        $console = new ConsoleCommandSender($this->plugin->getServer(), $this->plugin->getServer()->getLanguage());
-        $this->plugin->getServer()->dispatchCommand($console, "//load " . $schemName);
-        $this->plugin->getServer()->dispatchCommand($console, "//paste");
-
-        $data->set("lastReset", time());
-        $data->set("xp", 0);
-        $data->set("level", 0);
-        $data->save();
-
-        $player->sendMessage("§aAda başarıyla sıfırlandı!");
-    }
-
-    public function teleportToIsland(Player $player): void {
-        $data = $this->getPlayerData($player);
-        $island = $data->get("island", null);
-        if($island === null){
-            $player->sendMessage("§cHenüz adan yok!");
-            return;
-        }
-        [$x, $y, $z] = $island["spawn"];
-        $pos = new Position($x, $y, $z, $player->getWorld());
-        $player->teleport($pos);
-        $player->sendMessage("§aAdana ışınlandın!");
-    }
-
-    public function addPartner(Player $owner, string $partnerName): void {
-        $data = $this->getPlayerData($owner);
-        $partners = $data->get("partners", []);
-
-        if(count($partners) >= 2){
-            $owner->sendMessage("§cMaksimum 2 ortak ekleyebilirsin!");
-            return;
-        }
-
-        if(in_array($partnerName, $partners)){
-            $owner->sendMessage("§cBu oyuncu zaten ortak!");
-            return;
-        }
-
-        $partners[] = $partnerName;
-        $data->set("partners", $partners);
-        $data->save();
-
-        $owner->sendMessage("§a" . $partnerName . " adana ortak olarak eklendi!");
-    }
-
-    public function removePartner(Player $owner, string $partnerName): void {
-        $data = $this->getPlayerData($owner);
-        $partners = $data->get("partners", []);
-
-        if(!in_array($partnerName, $partners)){
-            $owner->sendMessage("§cBu oyuncu ortak değil!");
-            return;
-        }
-
-        $partners = array_diff($partners, [$partnerName]);
-        $data->set("partners", $partners);
-        $data->save();
-
-        $owner->sendMessage("§a" . $partnerName . " ortaklıktan çıkarıldı!");
+        // Oyuncuyu adanın üstüne ışınla
+        $player->teleport($center->add(0.5, 2, 0.5));
+        $player->sendMessage("§aSkyblock adan hazır!");
     }
 }
