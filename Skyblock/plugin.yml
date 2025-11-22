@@ -1,9 +1,9 @@
 name: SkyblockFormIsland
 main: Skyblock\Main
-version: 2.0.0
+version: 2.2.0
 api: 5.0.0
 author: Emir 
-description: Skyblock islands cloned from a .mcworld template via FormAPI menu
+description: Skyblock islands cloned from template.mcworld via FormAPI menu
 commands:
   ada:
     description: Skyblock ada menüsü
