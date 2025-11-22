@@ -13,7 +13,7 @@ class IslandManager {
         $worldName = "island_" . strtolower($player->getName());
         $wm = Server::getInstance()->getWorldManager();
 
-        // Eğer dünya yoksa MultiWorld ile void olarak oluştur
+        // Dünya yoksa MultiWorld ile void olarak oluştur
         if(!$wm->isWorldGenerated($worldName)){
             $console = new ConsoleCommandSender(Server::getInstance(), Server::getInstance()->getLanguage());
             Server::getInstance()->dispatchCommand($console, "mw create $worldName 0 void");
@@ -37,7 +37,7 @@ class IslandManager {
         // Console üzerinden schematic yükle ve yapıştır
         $console = new ConsoleCommandSender(Server::getInstance(), Server::getInstance()->getLanguage());
         Server::getInstance()->dispatchCommand($console, "//load myisland");
-        Server::getInstance()->dispatchCommand($console, "//paste");
+        Server::getInstance()->dispatchCommand($console, "//paste $baseX $baseY $baseZ $worldName");
 
         // Schematic boyutları: 6x6x5 → ortası
         $spawnX = $baseX + 3;
@@ -49,3 +49,4 @@ class IslandManager {
         $player->sendMessage("§aKendi Skyblock adan hazır, ortasında doğdun!");
     }
 }
+
