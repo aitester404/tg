@@ -38,6 +38,7 @@ class IslandManager {
         $x = 0; $y = 100; $z = 0;
 
         // EasyEdit schematic dosyasını console üzerinden yapıştır
+        // Dosya yolu plugin_data/EasyEdit/schematics/myisland.schem olmalı
         $console = new ConsoleCommandSender(Server::getInstance(), Server::getInstance()->getLanguage());
         Server::getInstance()->dispatchCommand($console, "easyedit paste myisland $x $y $z $worldName");
 
