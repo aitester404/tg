@@ -13,7 +13,7 @@ class IslandManager {
         $worldName = "island_" . strtolower($player->getName());
         $wm = Server::getInstance()->getWorldManager();
 
-        // Dünya yoksa EasyEdit ile void olarak oluştur (komut)
+        // Eğer dünya yoksa EasyEdit ile void olarak oluştur
         if(!$wm->isWorldGenerated($worldName)){
             $console = new ConsoleCommandSender(Server::getInstance(), Server::getInstance()->getLanguage());
             Server::getInstance()->dispatchCommand($console, "easyedit createworld $worldName void");
@@ -31,15 +31,25 @@ class IslandManager {
             return;
         }
 
-        // Ada koordinatı
-        $x = 0; $y = 100; $z = 0;
+        // Ada başlangıç koordinatı
+        $baseX = 0; $baseY = 100; $baseZ = 0;
 
-        // EasyEdit schematic dosyasını console üzerinden yapıştır
+        // EasyEdit schematic dosyasını yapıştır
         $console = new ConsoleCommandSender(Server::getInstance(), Server::getInstance()->getLanguage());
-        Server::getInstance()->dispatchCommand($console, "easyedit paste myisland $x $y $z $worldName");
+        Server::getInstance()->dispatchCommand($console, "easyedit paste myisland $baseX $baseY $baseZ $worldName");
 
-        // Oyuncuyu ışınla
-        $player->teleport(new Position($x, $y, $z, $world));
-        $player->sendMessage("§aKendi Skyblock adan hazır!");
+        // Schematic boyutları: 6x6x5
+        $schemWidth = 6;
+        $schemLength = 6;
+        $schemHeight = 5;
+
+        // Ortasını hesapla
+        $spawnX = $baseX + ($schemWidth / 2);
+        $spawnZ = $baseZ + ($schemLength / 2);
+        $spawnY = $baseY + $schemHeight;
+
+        // Oyuncuyu ortasına ışınla
+        $player->teleport(new Position($spawnX, $spawnY, $spawnZ, $world));
+        $player->sendMessage("§aKendi Skyblock adan hazır, ortasında doğdun!");
     }
 }
