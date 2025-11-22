@@ -1,13 +1,12 @@
 name: eSkyblock
 main: eSkyblock\Main
-version: 1.0.0
+version: 1.1.0
 api: 5.0.0
 author: Emir
+description: Oyuncu bazlı MultiWorld void dünyalarında menülü Skyblock adası oluşturma
 commands:
   ada:
-    description: Ada menüsünü açar
+    description: Skyblock menüsünü açar
     usage: /ada
-    permission: eskyblock.command.ada
-permissions:
-  eskyblock.command.ada:
-    default: true
+    permission: ""
+permissions: {}
