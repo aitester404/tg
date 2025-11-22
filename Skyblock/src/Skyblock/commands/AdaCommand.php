@@ -25,6 +25,11 @@ class AdaCommand extends Command {
             return;
         }
 
+        if(!$sender->hasPermission("skyblock.command.ada")){
+            $sender->sendMessage("§cBu komutu kullanma iznin yok.");
+            return;
+        }
+
         $form = new SimpleForm(function (Player $player, ?int $data) {
             if ($data === null) return;
 
