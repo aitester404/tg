@@ -7,17 +7,16 @@ use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\world\Position;
 use jojoe77777\FormAPI\SimpleForm;
+use pocketmine\console\ConsoleCommandSender;
 use pocketmine\utils\TextFormat;
+use easyedit\EasyEdit; // EasyEdit ana sınıfı
 
 class Main extends PluginBase {
 
-    private IslandService $islands;
-
     public function onEnable() : void {
-        @mkdir($this->getDataFolder());
-        $this->islands = new IslandService($this);
-        $this->getLogger()->info("SkyblockFormIsland aktif!");
+        $this->getLogger()->info("SkyblockFormIsland (EasyEdit schematic) aktif!");
     }
 
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool {
@@ -36,9 +35,9 @@ class Main extends PluginBase {
         $form = new SimpleForm(function(Player $player, ?int $data){
             if($data === null) return;
             switch($data){
-                case 0: $this->handleCreateIsland($player); break;
-                case 1: $this->handleGoIsland($player); break;
-                case 2: $this->handleDeleteIsland($player); break;
+                case 0: $this->createIsland($player); break;
+                case 1: $this->goIsland($player); break;
+                case 2: $this->deleteIsland($player); break;
             }
         });
 
@@ -51,38 +50,80 @@ class Main extends PluginBase {
         $player->sendForm($form);
     }
 
-    private function handleCreateIsland(Player $player) : void {
+    private function createIsland(Player $player) : void {
         $worldName = "island_" . strtolower($player->getName());
-        if($this->islands->createFromTemplate($worldName)){
-            $spawn = $this->islands->getIslandSpawn($worldName);
-            if($spawn !== null){
-                $player->teleport($spawn);
-                $player->sendMessage("§aAdan hazır! Template.mcworld klonlandı.");
-            } else {
-                $player->sendMessage("§cSpawn noktası bulunamadı.");
-            }
-        } else {
-            $player->sendMessage("§cAda oluşturulamadı. template.mcworld bulunamadı veya açılamadı.");
+        $wm = Server::getInstance()->getWorldManager();
+
+        // Dünya yoksa oluştur (void)
+        if(!$wm->isWorldGenerated($worldName)){
+            $console = new ConsoleCommandSender(Server::getInstance(), Server::getInstance()->getLanguage());
+            Server::getInstance()->dispatchCommand($console, "mw create $worldName 0 void");
+            $player->sendMessage("§aVoid dünya oluşturuldu: §f$worldName");
         }
+
+        if(!$wm->isWorldLoaded($worldName)){
+            $wm->loadWorld($worldName);
+        }
+
+        $world = $wm->getWorldByName($worldName);
+        if($world === null){
+            $player->sendMessage("§cDünya yüklenemedi: §f$worldName");
+            return;
+        }
+
+        // EasyEdit ile schematic paste
+        $schemPath = $this->getDataFolder() . "template.schem";
+        if(!is_file($schemPath)){
+            $player->sendMessage("§cSchematic bulunamadı: template.schem");
+            return;
+        }
+
+        $pastePos = new Position(0, 100, 0, $world); // ada merkezi
+        EasyEdit::getInstance()->getSchematicsManager()->pasteSchematic($schemPath, $pastePos);
+
+        // Oyuncuyu spawn noktasına ışınla
+        $player->teleport(new Position(0.5, 101, 0.5, $world));
+        $player->sendMessage("§aAda oluşturuldu: schematic paste edildi!");
     }
 
-    private function handleGoIsland(Player $player) : void {
+    private function goIsland(Player $player) : void {
         $worldName = "island_" . strtolower($player->getName());
-        $spawn = $this->islands->getIslandSpawn($worldName);
-        if($spawn !== null){
-            $player->teleport($spawn);
-            $player->sendMessage("§bAdana ışınlandın!");
-        } else {
+        $world = Server::getInstance()->getWorldManager()->getWorldByName($worldName);
+        if($world === null){
             $player->sendMessage("§cÖnce ada oluşturmalısın!");
+            return;
         }
+        $player->teleport(new Position(0.5, 101, 0.5, $world));
+        $player->sendMessage("§bAdana ışınlandın!");
     }
 
-    private function handleDeleteIsland(Player $player) : void {
+    private function deleteIsland(Player $player) : void {
         $worldName = "island_" . strtolower($player->getName());
-        if($this->islands->deleteIsland($worldName)){
+        $wm = Server::getInstance()->getWorldManager();
+
+        if($wm->isWorldLoaded($worldName)){
+            $wm->unloadWorld($wm->getWorldByName($worldName));
+        }
+
+        $path = Server::getInstance()->getDataPath() . "worlds/" . $worldName;
+        if(is_dir($path)){
+            $this->deleteDirectory($path);
             $player->sendMessage("§cAdan silindi: §f$worldName");
         } else {
-            $player->sendMessage("§cAdan bulunamadı veya silinemedi.");
+            $player->sendMessage("§cAdan bulunamadı!");
         }
+    }
+
+    private function deleteDirectory(string $dir) : void {
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach($files as $file){
+            $path = "$dir/$file";
+            if(is_dir($path)){
+                $this->deleteDirectory($path);
+            } else {
+                @unlink($path);
+            }
+        }
+        @rmdir($dir);
     }
 }
