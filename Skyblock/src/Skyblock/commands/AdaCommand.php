@@ -14,7 +14,8 @@ class AdaCommand extends Command {
     private Main $plugin;
 
     public function __construct(Main $plugin) {
-        parent::__construct("ada", "Ada menüsünü açar");
+        parent::__construct("ada", "Ada menüsünü açar", "/ada", ["island"]);
+        $this->setPermission("skyblock.command.ada");
         $this->plugin = $plugin;
     }
 
