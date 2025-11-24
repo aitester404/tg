@@ -1,0 +1,5 @@
+
+blocks:
+  diamond_block: 5 #When the player places a block, points will be added to the island. When the player breaks a block, points will be deducted.
+
+language-file: english #Custom language plugin
